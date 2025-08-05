@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Escanear QR y ver a Bob Esponja</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    #qr-reader {
+      width: 300px;
+      margin: 20px auto;
+    }
+    #gif-container {
+      display: none;
+      margin-top: 20px;
+    }
+    #gif-container img {
+      width: 300px;
+      border: 5px solid yellow;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Escanea el QR</h1>
+  <div id="qr-reader"></div>
+
+  <div id="gif-container">
+    <h2>¡Bob Esponja bailando!</h2>
+    <img src="Bob.gif" alt="Bob Esponja" />
+  </div>
+
+  <script>
+    const qrReader = new Html5Qrcode("qr-reader");
+    const gifContainer = document.getElementById("gif-container");
+
+    function onScanSuccess(decodedText, decodedResult) {
+      console.log(`QR detectado: ${decodedText}`);
+      qrReader.stop().then(() => {
+        document.getElementById("qr-reader").style.display = "none";
+        gifContainer.style.display = "block";
+      });
+    }
+
+    function onScanFailure(error) {
+      // No hacemos nada en cada fallo
+    }
+
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length) {
+        const cameraId = cameras[0].id;
+        qrReader.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          onScanSuccess,
+          onScanFailure
+        );
+      } else {
+        alert("No se detectó cámara.");
+      }
+    }).catch(err => {
+      alert("Error con la cámara: " + err);
+    });
+  </script>
+</body>
+</html>
